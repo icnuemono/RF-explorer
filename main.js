@@ -1,15 +1,10 @@
-var serialport = require('serialport');  //load serialport module
-var SerialPort = serialport.SerialPort;  //
-var port = new SerialPort(process.argv[2], { //open serial port on specified port with a 500k baudRate
-  baudRate: 500000,
-  parser: serialport.parsers.readline('\n')   //parse recieved lines
-});
+// Test code to interface with RF Explorer via serial port.
+// Requires firmware version 1.12+
 
-port.on('open', function() {   // callback to acknoledge that port has been opened
-  console.log('Port opened.'); // print "Port Opened"
-  port.write('#\x04C0');    //send command to RF Explorer
-});
+var rfe = require('./RFExplorer.js');
 
-port.on('data', function(data) {    //Callback that print recieved data 
-  console.log('Line received: ' + data);
+rfe.getCurrentConfig(function(config) {
+  console.log('Main Model: ' + config.mainModel);
+  console.log('Expansion Model: ' + config.expansionModel);
+  console.log('Firmware Version: ' + config.firmwareVersion);
 });
