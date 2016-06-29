@@ -1,26 +1,26 @@
-(function() {
-  var serialport = require('serialport');
+var serialport = require('serialport');
 
-  var openPort = function(dev) {
-    var SerialPort = serialport.SerialPort;
+var openPort = function(dev) {
+  var SerialPort = serialport.SerialPort;
 
-    // Open serial port on cmmm port with a 500k baudRate
-    return new SerialPort(dev, {
-      baudRate: 500000,
-      // Call 'data' event with a 'line' of data whenever <EOL> (CRLF) is received.
-      parser: serialport.parsers.readline('\r\n')
-    });
-  };
+  // Open serial port on cmmm port with a 500k baudRate
+  return new SerialPort(dev, {
+    baudRate: 500000,
+    // Call 'data' event with a 'line' of data whenever <EOL> (CRLF) is received.
+    parser: serialport.parsers.readline('\r\n')
+  });
+};
 
-  var RequestCommands = {
-    Current_Config: '#\x04C0'
-  };
+var RequestCommands = {
+  Current_Config: '#\x04C0'
+};
 
-  var ReceivedCommands = {
-    Current_Setup: '#C2-M:'
-  };
+var ReceivedCommands = {
+  Current_Setup: '#C2-M:'
+};
 
-  var getCurrentConfig = function(callback) {
+module.exports = {
+  getCurrentConfig: function(callback) {
     // Use the serial port specified by the third command line argument.
     var port = openPort(process.argv[2]);
 
@@ -42,9 +42,5 @@
         port.close();
       }
     });
-  };
-
-  module.exports = {
-    getCurrentConfig: getCurrentConfig
-  };
-})();
+  }
+};
