@@ -1,0 +1,11 @@
+{
+  "name": "RF-explorer",
+  "version": "1.0.0",
+  "dependencies": {
+    "serialport": "^3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/icnuemono/RF-explorer"
+  }
+}

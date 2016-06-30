@@ -34,6 +34,7 @@ module.exports = {
     port.on('data', function(data) {
       // console.log('Line received: ' + data);
       if (data.startsWith(ReceivedCommands.Current_Setup)) {
+        // #C2-M:003,005,01.09
         if (typeof callback == 'function') callback({
           mainModel: data.substr(6, 3),
           expansionModel: data.substr(10, 3),
