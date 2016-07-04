@@ -1,12 +1,14 @@
+// jshint esversion: 6
+
 var _ = require('underscore'),
     serialport = require('serialport'),
     events = require('events');
 
-var openPort = function(dev) {
+var openPort = (device) => {
   var SerialPort = serialport.SerialPort;
 
   // Open serial port on cmmm port with a 500k baudRate
-  return new SerialPort(dev, {
+  return new SerialPort(device, {
     baudRate: 500000,
     // Call 'data' event with a 'line' of data whenever <EOL> (CRLF) is received.
     parser: serialport.parsers.byteDelimiter([0x0d, 0x0a])
@@ -30,7 +32,7 @@ var ReceivedCommands = {
   Sweep_Data: '$S'
 };
 
-var text2ua = function(s) {
+var text2ua = (s) => {
   var ua = new Uint8Array(s.length);
   for (var i = 0; i < s.length; i++) {
     ua[i] = s.charCodeAt(i);
@@ -38,7 +40,7 @@ var text2ua = function(s) {
   return ua;
 };
 
-var ua2text = function(ua) {
+var ua2text = (ua) => {
   var s = '';
   for (var i = 0; i < ua.length; i++) {
     s += String.fromCharCode(ua[i]);
@@ -46,7 +48,7 @@ var ua2text = function(ua) {
   return s;
 };
 
-var getEnumerable = function(hash, value) {
+var getEnumerable = (hash, value) => {
   var s = hash[value];
   if (!s) s = 'Unknown';
   return s;
@@ -79,7 +81,7 @@ var CalculatorModes = {
 };
 
 var Parsers = {
-  "Current_Setup": function(text) {
+  "Current_Setup": (text) => {
     // setup: { mainModel: 006, expansionModel: 004, firmwareVersion: '01.12' }
 
     return {
@@ -89,7 +91,7 @@ var Parsers = {
     };
   },
 
-  "Current_Config": function(text) {
+  "Current_Config": (text) => {
     // config: Current device settings (frequencies, top/bottom, etc.)
 
     // #C2-F: <Start_Freq>, <Freq_Step>, <Amp_Top>, <Amp_Bottom>, <Sweep_Steps>,
@@ -127,7 +129,7 @@ var Parsers = {
     };
   },
 
-  "Sweep_Data": function(raw, emitter) {
+  "Sweep_Data": (raw, emitter) => {
     var count = raw[2];
     if (count != 112) {
       throw new Error('Did not receive 112 bytes.');
@@ -148,12 +150,12 @@ var Parsers = {
 
 module.exports = {
   // Returns an EventEmitter.
-  connection: function(tty) {
+  connection: (tty) => {
     var emitter = new events.EventEmitter();
 
     var port = openPort(tty);
 
-    port.on('open', function() {
+    port.on('open', () => {
       // Get the ball rolling:
       // port.write('#\x03R');
       port.write(RequestCommands.Current_Config);
@@ -161,7 +163,7 @@ module.exports = {
       // port.write('#\x05CM1');
     });
 
-    port.on('data', function(raw) {
+    port.on('data', (raw) => {
       raw = raw.slice(0, -2);
       text = ua2text(raw);
 
