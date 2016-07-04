@@ -2,7 +2,8 @@
   "name": "RF-explorer",
   "version": "1.0.0",
   "dependencies": {
-    "serialport": "^3"
+    "serialport": "^3",
+    "underscore": "^1"
   },
   "repository": {
     "type": "git",
