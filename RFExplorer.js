@@ -2,7 +2,8 @@
 
 var _ = require('underscore'),
     serialport = require('serialport'),
-    events = require('events');
+    events = require('events'),
+    frequencies = require('./frequencies.js');
 
 var openPort = (device) => {
   var SerialPort = serialport.SerialPort;
