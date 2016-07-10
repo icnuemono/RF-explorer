@@ -1,12 +1,12 @@
 // jshint esversion: 6
 
-var _ = require('underscore'),
+const _ = require('underscore'),
     serialport = require('serialport'),
     events = require('events'),
     frequencies = require('./frequencies.js');
 
-var openPort = (device) => {
-  var SerialPort = serialport.SerialPort;
+const openPort = (device) => {
+  let SerialPort = serialport.SerialPort;
 
   // Open serial port on cmmm port with a 500k baudRate
   return new SerialPort(device, {
@@ -16,11 +16,11 @@ var openPort = (device) => {
   });
 };
 
-var RequestCommands = {
+const RequestCommands = {
   Current_Config: '#\x04C0'
 };
 
-var ReceivedCommands = {
+const ReceivedCommands = {
   // #C2-M: <Main_Model>, <Expansion_Model>, <Firmware_Version> <EOL>
   Current_Setup: '#C2-M:',
 
@@ -33,29 +33,29 @@ var ReceivedCommands = {
   Sweep_Data: '$S'
 };
 
-var text2ua = (s) => {
-  var ua = new Uint8Array(s.length);
-  for (var i = 0; i < s.length; i++) {
+const text2ua = (s) => {
+  let ua = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) {
     ua[i] = s.charCodeAt(i);
   }
   return ua;
 };
 
-var ua2text = (ua) => {
-  var s = '';
-  for (var i = 0; i < ua.length; i++) {
+const ua2text = (ua) => {
+  let s = '';
+  for (let i = 0; i < ua.length; i++) {
     s += String.fromCharCode(ua[i]);
   }
   return s;
 };
 
-var getEnumerable = (hash, value) => {
-  var s = hash[value];
+const getEnumerable = (hash, value) => {
+  let s = hash[value];
   if (!s) s = 'Unknown';
   return s;
 };
 
-var Modules = {
+const Modules = {
   0: '433M',
   1: '868M',
   2: '915M',
@@ -67,13 +67,13 @@ var Modules = {
   255: 'None'
 };
 
-var Modes = {
+const Modes = {
   0: 'Spectrum Analyzer',
   1: 'RF Generator',
   2: 'Wi-Fi Analyzer'
 };
 
-var CalculatorModes = {
+const CalculatorModes = {
   0: 'Normal',
   1: 'Maximum',
   2: 'Average',
@@ -81,7 +81,7 @@ var CalculatorModes = {
   4: 'Maximum Hold'
 };
 
-var Parsers = {
+const Parsers = {
   "Current_Setup": (text) => {
     // setup: { mainModel: 006, expansionModel: 004, firmwareVersion: '01.12' }
 
@@ -99,9 +99,9 @@ var Parsers = {
     // <ExpModuleActive>, <CurrentMode>, <Min_Freq>, <Max_Freq>, <Max_Span>,
     // <RBW>, <AmpOffset>, <CalculatorMode> <EOL>
 
-    var values = text.substr(6).split(',');
+    const values = text.substr(6).split(',');
 
-    var startFrequency = values[0] * 1000,
+    const startFrequency = values[0] * 1000,
         frequencyStep = values[1],
         sweepSteps = values[4],
         span = frequencyStep * sweepSteps;
@@ -131,15 +131,14 @@ var Parsers = {
   },
 
   "Sweep_Data": (raw, emitter) => {
-    var count = raw[2];
-    if (count != 112) {
+    if (raw[2] != 112) {
       throw new Error('Did not receive 112 bytes.');
     }
 
-    var values = [];
+    const values = [];
 
     // Skip the $S and the count:
-    for (var i = ReceivedCommands.Sweep_Data.length + 1; i < raw.length; i++) {
+    for (let i = ReceivedCommands.Sweep_Data.length + 1; i < raw.length; i++) {
       // As per docs for <Adbm>, value should be divided by two and negated
       // values.push(-data.charCodeAt(i)/2);
       values.push(Number(raw[i]) / -2.0);
@@ -152,9 +151,8 @@ var Parsers = {
 module.exports = {
   // Returns an EventEmitter.
   connection: (tty) => {
-    var emitter = new events.EventEmitter();
-
-    var port = openPort(tty);
+    const emitter = new events.EventEmitter();
+    const port = openPort(tty);
 
     port.on('open', () => {
       // Get the ball rolling:

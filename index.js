@@ -3,10 +3,10 @@
 // Test code to interface with RF Explorer via serial port.
 // Requires firmware version 1.12+
 
-var _ = require('underscore'),
+let _ = require('underscore'),
     rfe = require('./RFExplorer.js');
 
-var conn = rfe.connection(process.argv[2]);
+let conn = rfe.connection(process.argv[2]);
 
 conn.on('setup', (data) => {
   console.log(`Main Model: ${data.mainModel}`);
@@ -17,7 +17,7 @@ conn.on('setup', (data) => {
 conn.on('config', (data) => {
   console.log(data);
 });
-var count = 0;
+let count = 0;
 
 conn.on('data', (data) => {
   console.log(data.join(','));
